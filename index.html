@@ -136,8 +136,8 @@ body {
   </div>
 </header>
 
-<nav class="bg-white border-b border-slate-100 sticky top-[57px] sm:top-[53px] z-40 shadow-xs">
-  <div class="max-w-4xl mx-auto flex items-center overflow-x-auto no-scrollbar gap-1.5 px-3 py-2">
+<nav class="bg-white border-b border-slate-100 sticky top-[calc(96px+env(safe-area-inset-top))] sm:top-[53px] z-40 shadow-xs">
+  <div class="max-w-4xl mx-auto flex items-center overflow-x-auto overscroll-x-contain no-scrollbar gap-1.5 px-3 py-2">
     <button onclick="setMode('all')" id="mode-all" class="mode-tab px-3 py-1 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap transition">전체 학습</button>
     <span class="h-4 w-px bg-slate-200 mx-1 shrink-0"></span>
 
@@ -1376,6 +1376,15 @@ function setCategory(cat) {
 function setMode(mode) {
   viewMode = mode;
   currentIndex = 0; // 모드 변경 시 인덱스 초기화
+
+  // 전체 학습은 언제나 114개 통합 목록의 첫 문제부터 시작
+  if (mode === 'all') {
+    currentCategory = 'all';
+    currentRandomList = [];
+    document.querySelectorAll('.cat-tab').forEach(t => {
+      t.className = "cat-tab px-3 py-1.5 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap transition";
+    });
+  }
 
   // Update Mode Tab Styling
   document.querySelectorAll('.mode-tab').forEach(t => {
