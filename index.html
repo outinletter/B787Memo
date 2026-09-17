@@ -1014,7 +1014,9 @@ const ALL_QUESTIONS_MAP = {}; // Global flat lookup map for all questions by ID
 let currentIndex = 0;
 let currentQuestionsList = [];
 let touchStartX = 0;
+let touchStartY = 0;
 let touchEndX = 0;
+let touchEndY = 0;
 
 // Global Questions Map Initialization
 function initializeQuestionsMap() {
@@ -1217,22 +1219,21 @@ function renderSingleCard(q, idx, total) {
   }
 
   container.innerHTML = html;
-
-  // 스와이프 이벤트 리스너 등록
-  const cardElem = container.firstChild;
-  cardElem.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX);
-  cardElem.addEventListener('touchend', e => {
-    touchEndX = e.changedTouches[0].screenX;
-    handleSwipe();
-  });
 }
 
 function handleSwipe() {
-  const swipeThreshold = 50;
-  if (touchEndX < touchStartX - swipeThreshold) {
-    nextQuestion();
-  } else if (touchEndX > touchStartX + swipeThreshold) {
-    prevQuestion();
+  const swipeThreshold = 50; // 최소 이동 거리 (px)
+
+  const diffX = touchEndX - touchStartX;
+  const diffY = touchEndY - touchStartY;
+
+  // 가로 이동이 세로 이동보다 훨씬 클 때만 스와이프로 간주 (세로 스크롤 방해 금지)
+  if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > swipeThreshold) {
+    if (diffX < 0) {
+      nextQuestion(); // 왼쪽으로 스와이프 -> 다음
+    } else {
+      prevQuestion(); // 오른쪽으로 스와이프 -> 이전
+    }
   }
 }
 
@@ -1593,7 +1594,20 @@ window.onload = function() {
     subSolvedStatus = JSON.parse(savedGrades);
   }
   updateSolvedCount();
-  
+
+  // 스와이프 리스너 등록 (Global)
+  const container = document.getElementById('quizContainer');
+  container.addEventListener('touchstart', e => {
+    touchStartX = e.changedTouches[0].screenX;
+    touchStartY = e.changedTouches[0].screenY;
+  }, {passive: true});
+
+  container.addEventListener('touchend', e => {
+    touchEndX = e.changedTouches[0].screenX;
+    touchEndY = e.changedTouches[0].screenY;
+    handleSwipe();
+  }, {passive: true});
+
   // 카테고리 '전체', 모드 '객관식'으로 디폴트 동시 활성화
   setCategory('all');
   setMode('mcq');
