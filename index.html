@@ -139,7 +139,6 @@ body {
 <nav class="bg-white border-b border-slate-100 sticky top-[57px] sm:top-[53px] z-40 shadow-xs">
   <div class="max-w-4xl mx-auto flex items-center overflow-x-auto no-scrollbar gap-1.5 px-3 py-2">
     <span class="text-[11px] font-black text-slate-400 shrink-0 mr-1 select-none">카테고리</span>
-    <button onclick="setCategory('all')" id="cat-all" class="cat-tab px-3 py-1.5 text-xs font-extrabold rounded-full text-white bg-sky-400 shadow-sm whitespace-nowrap transition">전체보기</button>
     <button onclick="setCategory('lim')" id="cat-lim" class="cat-tab px-3 py-1.5 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap transition">Limitation</button>
     <button onclick="setCategory('norm')" id="cat-norm" class="cat-tab px-3 py-1.5 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap transition">Normal &amp; OMB</button>
     <button onclick="setCategory('weather')" id="cat-weather" class="cat-tab px-3 py-1.5 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap transition">Weather &amp; Fuel</button>
@@ -152,6 +151,7 @@ body {
     <button onclick="setMode('mcq')" id="mode-mcq" class="mode-tab px-3 py-1 text-xs font-extrabold rounded-full text-white bg-sky-400 border border-sky-300 shadow-sm whitespace-nowrap transition">객관식 평가</button>
     <button onclick="setMode('sa')" id="mode-sa" class="mode-tab px-3 py-1 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap transition">주관식 평가</button>
     <button onclick="setMode('fc')" id="mode-fc" class="mode-tab px-3 py-1 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap transition">Flashcard</button>
+    <button onclick="setMode('all')" id="mode-all" class="mode-tab px-3 py-1 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap transition">전체 학습</button>
   </div>
 </nav>
 
@@ -1007,7 +1007,7 @@ const SUBJECTIVE_QUIZ_DATA = [
 
 let solvedList = new Set();
 let currentCategory = 'all';
-let viewMode = 'mcq'; // 'mcq', 'sa', or 'fc'
+let viewMode = 'all'; // 'mcq', 'sa', 'fc', or 'all'
 let subSolvedStatus = {}; // Subjective grading status map
 let currentRandomList = []; // 현재 랜덤 실행 상태 보존용 리스트
 const ALL_QUESTIONS_MAP = {}; // Global flat lookup map for all questions by ID
@@ -1017,6 +1017,15 @@ function getAllMCQQuestions() {
   return Object.entries(SYSTEM_QUIZ_DATA)
     .filter(([category]) => category !== 'sa')
     .flatMap(([, questions]) => questions);
+}
+
+function getAllLearningQuestions() {
+  return [...getAllMCQQuestions(), ...SUBJECTIVE_QUIZ_DATA, ...FLASHCARD_DATA];
+}
+
+function formatFlashcardQuestion(question) {
+  // 이모지 물음표는 기기별로 빨간색·다른 크기로 보일 수 있어 일반 텍스트로 표시한다.
+  return question.replaceAll('❓', '?');
 }
 
 // 카드 시스템 전용 상태
@@ -1077,7 +1086,11 @@ function render() {
 
   // 데이터 리스트 준비
   let questions = [];
-  if (viewMode === 'fc') {
+  if (viewMode === 'all') {
+    questions = currentCategory === 'all'
+      ? getAllLearningQuestions()
+      : getAllLearningQuestions().filter(q => q.cat === currentCategory);
+  } else if (viewMode === 'fc') {
     questions = (currentCategory === 'all') ? FLASHCARD_DATA : FLASHCARD_DATA.filter(q => q.cat === currentCategory);
   } else if (viewMode === 'sa') {
     questions = (currentCategory === 'all') ? SUBJECTIVE_QUIZ_DATA : SUBJECTIVE_QUIZ_DATA.filter(q => q.cat === currentCategory);
@@ -1139,7 +1152,9 @@ function renderSingleCard(q, idx, total) {
   const qId = q.id;
   const displayCat = getCategoryLabel(q.cat || currentCategory);
 
-  if (viewMode === 'fc') {
+  const questionType = q.opts ? 'mcq' : (q.keywords ? 'sa' : 'fc');
+
+  if (questionType === 'fc') {
     const isParenthesesCard = q.q.includes('❓');
     const cardTheme = isParenthesesCard ? 'from-amber-50 to-amber-100/30' : 'from-emerald-50 to-emerald-100/30';
     const borderTheme = isParenthesesCard ? 'border-amber-200/60' : 'border-emerald-200/60';
@@ -1153,9 +1168,9 @@ function renderSingleCard(q, idx, total) {
               <span class="text-[10px] font-black tracking-widest text-slate-500 uppercase">${displayCat}</span>
               ${isSolved ? '<span class="bg-emerald-50 text-emerald-600 text-[10px] font-bold px-2.5 py-1 rounded-full border border-emerald-100">완료 ✓</span>' : ''}
             </div>
-            <div class="text-slate-800 font-black text-center text-base md:text-lg my-auto px-4 leading-snug">
+            <div class="text-slate-800 font-black text-center text-base md:text-lg my-auto mx-auto max-w-2xl px-4 leading-relaxed break-keep">
               ${q.img ? `<img src="${q.img}" class="max-h-40 mx-auto mb-4 rounded-xl shadow-md border border-white/50">` : ''}
-              ${q.q}
+              ${formatFlashcardQuestion(q.q)}
             </div>
             <div class="text-[10px] text-slate-400 text-center font-bold animate-pulse tracking-wide">TAP TO FLIP 🔄</div>
           </div>
@@ -1170,7 +1185,7 @@ function renderSingleCard(q, idx, total) {
         </div>
       </div>
     `;
-  } else if (viewMode === 'sa') {
+  } else if (questionType === 'sa') {
     const savedGrade = subSolvedStatus[q.id];
     let statusBadge = '';
     if (savedGrade === 'perfect') statusBadge = `<span class="bg-emerald-50 text-emerald-600 text-[10px] font-bold px-2.5 py-1 rounded-full border border-emerald-100">완벽히 암기함 🌟</span>`;
@@ -1376,6 +1391,8 @@ function setMode(mode) {
       activeTab.className = "mode-tab px-3 py-1 text-xs font-extrabold rounded-full text-white bg-indigo-300 border border-indigo-200 shadow-sm whitespace-nowrap transition";
     } else if (mode === 'fc') {
       activeTab.className = "mode-tab px-3 py-1 text-xs font-extrabold rounded-full text-white bg-emerald-300 border border-emerald-200 shadow-sm whitespace-nowrap transition";
+    } else if (mode === 'all') {
+      activeTab.className = "mode-tab px-3 py-1 text-xs font-extrabold rounded-full text-white bg-violet-400 border border-violet-300 shadow-sm whitespace-nowrap transition";
     }
   }
   render();
@@ -1618,9 +1635,9 @@ window.onload = function() {
     handleSwipe();
   }, {passive: true});
 
-  // 카테고리 '전체', 모드 '객관식'으로 디폴트 동시 활성화
+  // 카테고리 '전체', 모드 '전체 학습'으로 디폴트 동시 활성화
   setCategory('all');
-  setMode('mcq');
+  setMode('all');
 };
 </script>
 </body>
