@@ -2,7 +2,10 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#f4f7fc">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>B787 Systems & Memo Comprehensive Quiz</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,22 +14,28 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
 :root {
-  --quiz-font-size: 14px;
+  --quiz-font-size: 15px;
 }
 body {
   font-family: 'Inter', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
   background-color: #f4f7fc;
-  color: #2c3e50;
+  color: #1e293b;
   -webkit-tap-highlight-color: transparent;
+  line-height: 1.6;
+  padding-bottom: env(safe-area-inset-bottom);
 }
 .q-text {
   font-size: var(--quiz-font-size);
+  line-height: 1.5;
+  letter-spacing: -0.01em;
 }
 .opt-text {
   font-size: calc(var(--quiz-font-size) - 1px);
+  line-height: 1.4;
 }
 .exp-text {
   font-size: calc(var(--quiz-font-size) - 2px);
+  line-height: 1.5;
 }
 /* 모바일 터치 최적화 스크롤 */
 .no-scrollbar::-webkit-scrollbar {
@@ -49,7 +58,7 @@ body {
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   transform-style: preserve-3d;
 }
-.flip-card.flipped .flip-card-inner {
+.flip-card-inner.flipped {
   transform: rotateY(180deg);
 }
 .flip-card-front, .flip-card-back {
@@ -63,16 +72,43 @@ body {
 .flip-card-back {
   transform: rotateY(180deg);
 }
+/* 카드 전환 애니메이션 */
+.card-fade-in {
+  animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+/* 커스텀 진행바 */
+.progress-dots {
+  display: flex;
+  gap: 4px;
+}
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #e2e8f0;
+  transition: all 0.3s ease;
+}
+.dot.active {
+  background-color: #3b82f6;
+  transform: scale(1.2);
+}
+.dot.solved {
+  background-color: #10b981;
+}
 </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased">
 
-<header class="bg-white/90 backdrop-blur-md sticky top-0 z-50 px-3 py-3 border-b border-blue-100/60 shadow-xs">
+<header class="bg-white/95 backdrop-blur-md sticky top-0 z-50 px-4 py-3 border-b border-sky-100/60 shadow-xs pt-[env(safe-area-inset-top)]">
   <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
     <div class="flex items-center gap-2.5 w-full sm:w-auto">
       <div class="leading-tight">
-        <h1 class="font-extrabold text-sm tracking-tight text-blue-600">B787 SYSTEM MASTER MEMO</h1>
-        <p class="text-[10px] text-slate-400 font-bold">FCOM/FCTM 핵심 지침 분석 및 종합 자동 평가</p>
+        <h1 class="font-black text-sm tracking-tight text-sky-500">B787 MASTER MEMO</h1>
+        <p class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">FCOM/FCTM Intelligence</p>
       </div>
     </div>
     <div class="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto">
@@ -89,7 +125,7 @@ body {
       <!-- 텍스트 크기 조절기 (숫자 제거 및 심플 레이아웃 설계) -->
       <div class="flex items-center bg-[#f1f5f9] border border-slate-200 rounded-lg p-0.5 shrink-0">
         <button onclick="changeFontSize(-1)" class="w-6 h-6 flex items-center justify-center text-xs font-bold text-slate-600 hover:bg-white rounded transition shadow-2xs" title="글자 작게">A-</button>
-        <span id="fontLabel" class="hidden">14px</span>
+        <span id="fontLabel" class="hidden">15px</span>
         <span class="text-xs font-bold px-2 text-slate-400 select-none">A</span>
         <button onclick="changeFontSize(1)" class="w-6 h-6 flex items-center justify-center text-xs font-bold text-slate-600 hover:bg-white rounded transition shadow-2xs" title="글자 크게">A+</button>
       </div>
@@ -100,7 +136,7 @@ body {
 <nav class="bg-white border-b border-slate-100 sticky top-[57px] sm:top-[53px] z-40 shadow-xs">
   <div class="max-w-4xl mx-auto flex items-center overflow-x-auto no-scrollbar gap-1.5 px-3 py-2">
     <span class="text-[11px] font-black text-slate-400 shrink-0 mr-1 select-none">카테고리</span>
-    <button onclick="setCategory('all')" id="cat-all" class="cat-tab px-3 py-1.5 text-xs font-extrabold rounded-full text-white bg-blue-600 shadow-sm whitespace-nowrap transition">전체보기</button>
+    <button onclick="setCategory('all')" id="cat-all" class="cat-tab px-3 py-1.5 text-xs font-extrabold rounded-full text-white bg-sky-400 shadow-sm whitespace-nowrap transition">전체보기</button>
     <button onclick="setCategory('lim')" id="cat-lim" class="cat-tab px-3 py-1.5 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap transition">Limitation</button>
     <button onclick="setCategory('norm')" id="cat-norm" class="cat-tab px-3 py-1.5 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap transition">Normal &amp; OMB</button>
     <button onclick="setCategory('weather')" id="cat-weather" class="cat-tab px-3 py-1.5 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap transition">Weather &amp; Fuel</button>
@@ -110,7 +146,7 @@ body {
     <span class="h-4 w-px bg-slate-200 mx-1 shrink-0"></span>
 
     <span class="text-[11px] font-black text-slate-400 shrink-0 mr-1 select-none">학습모드</span>
-    <button onclick="setMode('mcq')" id="mode-mcq" class="mode-tab px-3 py-1 text-xs font-extrabold rounded-full text-white bg-blue-600 border border-blue-600 shadow-sm whitespace-nowrap transition">객관식 평가</button>
+    <button onclick="setMode('mcq')" id="mode-mcq" class="mode-tab px-3 py-1 text-xs font-extrabold rounded-full text-white bg-sky-400 border border-sky-300 shadow-sm whitespace-nowrap transition">객관식 평가</button>
     <button onclick="setMode('sa')" id="mode-sa" class="mode-tab px-3 py-1 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap transition">주관식 평가</button>
     <button onclick="setMode('fc')" id="mode-fc" class="mode-tab px-3 py-1 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap transition">Flashcard</button>
   </div>
@@ -118,60 +154,59 @@ body {
 
 <!-- ── MAIN AREA ── -->
 <main class="flex-1 max-w-4xl w-full mx-auto p-3 md:py-6">
-  <section id="visualSchematics" class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-3">
-    <!-- 테일 스트라이크 & 고도 마진 다이어그램 -->
-    <div class="bg-white rounded-2xl p-3.5 border border-blue-100/50 shadow-xs flex flex-col justify-between">
-      <div class="flex items-center justify-between mb-1.5">
-        <h3 class="text-xs font-black tracking-tight text-slate-600">PITCH LIMITS &amp; TAIL STRIKE</h3>
-        <span class="text-[9px] bg-rose-50 text-rose-500 px-2 py-0.5 rounded-full font-bold">B787-9 vs B787-10</span>
-      </div>
-      <div class="h-24 flex items-center justify-center my-1 bg-[#fbfcfd] rounded-xl overflow-hidden relative border border-slate-100">
-        <svg class="w-full h-full max-w-[260px]" viewBox="0 0 300 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <line x1="10" y1="95" x2="290" y2="95" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="3 3"/>
-          <g transform="translate(130, 80) rotate(-7)">
-            <line x1="-100" y1="0" x2="100" y2="0" stroke="#60a5fa" stroke-width="2.5" stroke-linecap="round"/>
-            <circle cx="100" cy="0" r="3.5" fill="#3b82f6"/>
-            <line x1="-90" y1="0" x2="-100" y2="-22" stroke="#60a5fa" stroke-width="2.5"/>
-            <ellipse cx="0" cy="0" rx="12" ry="4" fill="#2563eb"/>
-          </g>
-          <circle cx="130" cy="90" r="4.5" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
-          <circle cx="142" cy="90" r="4.5" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
-          <path d="M130,90 L260,90 M130,90 L250,55" stroke="#f43f5e" stroke-width="1.2" stroke-linecap="round"/>
-          <text x="220" y="85" fill="#f43f5e" class="text-[9px] font-bold">B787-9: 7.8° (9.7°)</text>
-          <text x="190" y="45" fill="#475569" class="text-[9px] font-bold">B787-10: 6.8°</text>
-        </svg>
-        <span class="absolute bottom-1.5 left-2 text-[8px] text-slate-400">이착륙 피치 마진 : 단 2.2°</span>
-      </div>
-      <p class="text-[10px] text-slate-400 mt-1 leading-normal">Liftoff 지시 부재 시 PM은 즉시 <b class="text-rose-400">“PITCH, PITCH”</b> 콜아웃을 하고, PF는 해당 피치를 유지해야 합니다.</p>
-    </div>
-
-    <!-- 180도 선회 포장 폭 다이어그램 -->
-    <div class="bg-white rounded-2xl p-3.5 border border-emerald-100/50 shadow-xs flex flex-col justify-between">
-      <div class="flex items-center justify-between mb-1.5">
-        <h3 class="text-xs font-black tracking-tight text-slate-600 uppercase">180° Turn Pavement Width</h3>
-        <span class="text-[9px] bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full font-bold">FCTM 2.10</span>
-      </div>
-      <div class="h-24 flex items-center justify-center my-1 bg-[#fbfcfd] rounded-xl overflow-hidden relative border border-slate-100">
-        <svg class="w-full h-full max-w-[260px]" viewBox="0 0 300 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="150" cy="60" r="45" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="2 2"/>
-          <circle cx="150" cy="60" r="32" stroke="#cbd5e1" stroke-width="1.5"/>
-          <line x1="150" y1="60" x2="190" y2="38" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/>
-          <text x="175" y="55" fill="#3b82f6" class="text-[8px] font-bold">Tail R</text>
-          <line x1="150" y1="60" x2="115" y2="85" stroke="#10b981" stroke-width="1.5" stroke-linecap="round"/>
-          <text x="102" y="73" fill="#10b981" class="text-[8px] font-bold">Nose R</text>
-          <rect x="148" y="53" width="3" height="14" rx="1" fill="#64748b"/>
-        </svg>
-        <span class="absolute bottom-1.5 left-2 text-[8px] text-slate-400">창 하단 모서리 = 메인 기어 지시 기준</span>
-      </div>
-      <div class="text-[10px] text-slate-500 mt-1 space-y-0.5">
-        <div>• <b>B787-9 선회 반경 폭:</b> <span class="text-blue-500 font-bold">154 ft (47.0 m)</span></div>
-        <div>• <b>B787-10 선회 반경 폭:</b> <span class="text-emerald-500 font-bold">176 ft 7 in (53.8 m)</span></div>
-      </div>
-    </div>
-  </section>
-
   <!-- 메인 질문 영역 로더 -->
-  <div id="quizContainer" class="space-y-4"></div>
+  <div id="quizArea" class="hidden">
+    <!-- 상단 진행바 -->
+    <div class="bg-white rounded-2xl p-4 mb-5 border border-sky-100/50 shadow-xs flex items-center justify-between">
+      <div class="flex flex-col gap-1.5 flex-1">
+        <div class="flex items-center justify-between pr-4">
+          <span id="quizProgressText" class="text-[10px] font-black text-sky-500 uppercase tracking-widest">Question 1 / 20</span>
+          <span id="quizPercentText" class="text-[10px] font-mono font-black text-slate-400">5%</span>
+        </div>
+        <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden mt-0.5">
+          <div id="quizProgressBar" class="h-full bg-sky-300 transition-all duration-500 shadow-[0_0_8px_rgba(125,211,252,0.4)]" style="width: 5%"></div>
+        </div>
+      </div>
+      <div id="progressDots" class="hidden md:flex progress-dots ml-4"></div>
+    </div>
+
+    <!-- 카드 컨테이너 -->
+    <div id="quizContainer" class="card-fade-in"></div>
+
+    <!-- 내비게이션 컨트롤 -->
+    <div class="mt-6 flex items-center justify-between gap-3 px-1">
+      <button onclick="prevQuestion()" id="prevBtn" class="flex-1 bg-white border border-slate-200 text-slate-600 font-bold py-4 px-4 rounded-2xl text-xs hover:bg-slate-50 transition shadow-xs flex items-center justify-center gap-2 active:scale-95">
+        <span>←</span> 이전
+      </button>
+      <button onclick="nextQuestion()" id="nextBtn" class="flex-[2] bg-slate-400 text-white font-black py-4 px-4 rounded-2xl text-xs hover:bg-slate-500 transition shadow-sm flex items-center justify-center gap-2 active:scale-95">
+        다음 문제 <span>→</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 결과 화면 로더 (히든) -->
+  <div id="resultArea" class="hidden space-y-4 card-fade-in">
+    <div class="bg-white rounded-3xl p-8 border border-blue-100 shadow-sm text-center">
+      <div class="w-20 h-20 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">🏆</div>
+      <h2 class="text-xl font-black text-slate-800 mb-1">학습을 완료했습니다!</h2>
+      <p class="text-xs text-slate-400 font-medium mb-6">오늘의 시스템 마스터 미션이 성공적으로 기록되었습니다.</p>
+
+      <div class="grid grid-cols-2 gap-3 mb-8">
+        <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100">
+          <div class="text-[10px] font-black text-slate-400 uppercase mb-1">총 문항</div>
+          <div id="resTotal" class="text-xl font-mono font-black text-slate-800">20</div>
+        </div>
+        <div class="bg-emerald-50 rounded-2xl p-4 border border-emerald-100">
+          <div class="text-[10px] font-black text-emerald-600 uppercase mb-1">누적 완료</div>
+          <div id="resSolved" class="text-xl font-mono font-black text-emerald-600">0</div>
+        </div>
+      </div>
+
+      <button onclick="location.reload()" class="w-full bg-blue-600 text-white font-black py-4 rounded-2xl text-sm hover:bg-blue-700 transition shadow-lg">
+        처음으로 돌아가기
+      </button>
+    </div>
+  </div>
 </main>
 
 <script>
@@ -608,7 +643,7 @@ const SYSTEM_QUIZ_DATA = {
       id: "mcq-nonnorm-6",
       q: "엔진 고장 발생 후 기수 상승 중 고도가 1,500 ft AGL을 통과할 때의 자동 제어 추력 한계(Thrust Limit) 변화 및 이에 따른 조종사의 비행 지침으로 올바른 것은 무엇입니까?",
       opts: [
-        "가용 추력 한계가 CON(Maximum Continuous)으로 자동 고정되므로 조종사는 아무런 조작을 하지 않아도 된다.",
+        "가용 추력 한계가 CON(Maximum Continuous)으로 자동 고정된다면 조종사는 아무런 조작을 하지 않아도 된다.",
         "엔진 고장 상태로 1,500 ft AGL 통과 시 thrust limit이 CLB(Climb)로 자동 변경되므로, 오토스로틀(A/THR)을 해제하고 수동으로 추력을 증가시키는 것이 권장된다.",
         "thrust limit이 자동으로 TO/GA 최대 출력 상태로 지속 연장된다.",
         "자동 조종 오토스로틀이 해제되면서 역추력 제동 압력이 자동으로 차단되므로 조종사는 수동 제동을 준비해야 한다."
@@ -709,7 +744,9 @@ const FLASHCARD_DATA = [
   { id: "fc-34", cat: "norm", q: "Engine Start without APU: At a minimum, ( ❓ ) forward external power sources are required.", ans: "정답: two 90 kVA rated\n\n(APU 없이 전방 외부 전원만으로 시동을 걸기 위해 요구되는 최소한의 공급 전력원 수량 규정입니다.)" },
   { id: "fc-35", cat: "nonnorm", q: "If ENG FAIL occurs above 1,500 ft AGL, the thrust limit will automatically change to ( ❓ ).", ans: "정답: CLB (Climb)\n\n(상승 출력 한계로 변경되므로, 안전 추진 마진 확보를 위해 A/THR을 끄고 수동 증가가 권장됩니다.)" },
   { id: "fc-36", cat: "nonnorm", q: "ENGINE INOPERATIVE DRIFTDOWN: Under normal FMC operation, the VNAV PTH mode commands a ( ❓ ) descent rate.", ans: "정답: 300 fpm\n\n(FMC가 가동되는 최적 드리프트다운 경로에서의 최초 자동 하강률 한계 지시 수치입니다.)" },
-  { id: "fc-37", cat: "nonnorm", q: "In-Flight Start Envelope is displayed in ( ❓ ) color on the PFD/ND under abnormal start situations.", ans: "정답: magenta (자줏빛)\n\n(재시동 가능 영역은 조종실 주 비행 디스플레이 창에 자줏빛으로 자동 도식화됩니다.)" }
+  { id: "fc-37", cat: "nonnorm", q: "In-Flight Start Envelope is displayed in ( ❓ ) color on the PFD/ND under abnormal start situations.", ans: "정답: magenta (자줏빛)\n\n(재시동 가능 영역은 조종실 주 비행 디스플레이 창에 자줏빛으로 자동 도식화됩니다.)" },
+  { id: "fc-38", cat: "lim", q: "PITCH LIMITS & TAIL STRIKE (B787-9 vs B787-10) - 각 기종의 한계 피치각과 이착륙 피치 마진은?", ans: "• B787-9: 7.8° (지상 청소각 고려 시 9.7°)\n• B787-10: 6.8°\n• 이착륙 피치 마진: 단 2.2°\n\n*Liftoff 지시 부재 시 PM은 즉시 'PITCH, PITCH' 콜아웃을 하고, PF는 해당 피치를 유지해야 합니다." },
+  { id: "fc-39", cat: "lim", q: "180° TURN PAVEMENT WIDTH (FCTM 2.10) - B787-9 및 B787-10의 최소 선회 반경 폭은?", ans: "• B787-9: 154 ft (47.0 m)\n• B787-10: 176 ft 7 in (53.8 m)\n\n*창 하단 모서리 = 메인 기어 지시 기준" }
 ];
 
 // ── SUBJECTIVE (SHORT ANSWER) QUIZ DATA (35 QUESTIONS) ──
@@ -970,6 +1007,12 @@ let subSolvedStatus = {}; // Subjective grading status map
 let currentRandomList = []; // 현재 랜덤 실행 상태 보존용 리스트
 const ALL_QUESTIONS_MAP = {}; // Global flat lookup map for all questions by ID
 
+// 카드 시스템 전용 상태
+let currentIndex = 0;
+let currentQuestionsList = [];
+let touchStartX = 0;
+let touchEndX = 0;
+
 // Global Questions Map Initialization
 function initializeQuestionsMap() {
   // Populate from MCQ data
@@ -1005,10 +1048,278 @@ function changeFontSize(dir) {
   document.documentElement.style.setProperty('--quiz-font-size', size + 'px');
 }
 
+// 퀴즈 렌더링 엔진
+function render() {
+  const container = document.getElementById('quizContainer');
+  const quizArea = document.getElementById('quizArea');
+  const resultArea = document.getElementById('resultArea');
+  const visualSchematics = document.getElementById('visualSchematics');
+
+  // UI 모드 초기화
+  quizArea.classList.remove('hidden');
+  resultArea.classList.add('hidden');
+  container.innerHTML = '';
+
+  // 데이터 리스트 준비
+  let questions = [];
+  if (viewMode === 'fc') {
+    questions = (currentCategory === 'all') ? FLASHCARD_DATA : FLASHCARD_DATA.filter(q => q.cat === currentCategory);
+  } else if (viewMode === 'sa') {
+    questions = (currentCategory === 'all') ? SUBJECTIVE_QUIZ_DATA : SUBJECTIVE_QUIZ_DATA.filter(q => q.cat === currentCategory);
+  } else {
+    if (currentCategory === 'random') {
+      questions = currentRandomList;
+    } else {
+      questions = (currentCategory === 'all')
+        ? [...SYSTEM_QUIZ_DATA.lim, ...SYSTEM_QUIZ_DATA.norm, ...SYSTEM_QUIZ_DATA.weather, ...SYSTEM_QUIZ_DATA.nonnorm]
+        : SYSTEM_QUIZ_DATA[currentCategory] || [];
+    }
+  }
+
+  currentQuestionsList = questions;
+
+  // 데이터가 없는 경우 처리
+  if (questions.length === 0) {
+    container.innerHTML = `
+      <div class="bg-white rounded-2xl p-12 text-center text-slate-400 border border-slate-200 shadow-xs">
+        <span class="text-4xl">📂</span>
+        <p class="mt-4 text-sm font-bold">선택하신 조건에 해당하는 문항이 없습니다.</p>
+      </div>
+    `;
+    updateNavigation();
+    return;
+  }
+
+  // 인덱스 범위 조정
+  if (currentIndex >= questions.length) currentIndex = 0;
+
+  // 스키매틱 뷰 표시 로직 (제거됨 - 플래시카드로 통합)
+  if (visualSchematics) visualSchematics.classList.add('hidden');
+
+  const q = questions[currentIndex];
+  renderSingleCard(q, currentIndex, questions.length);
+  updateNavigation();
+  updateProgressBar();
+}
+
+function renderSingleCard(q, idx, total) {
+  const container = document.getElementById('quizContainer');
+  container.className = "card-fade-in";
+
+  let html = '';
+  const isSolved = solvedList.has(q.id);
+  const qId = q.id; // Helper for explanation ID
+
+  if (viewMode === 'fc') {
+    const isParenthesesCard = q.q.includes('❓');
+    const cardTheme = isParenthesesCard ? 'from-amber-50 to-amber-100/30' : 'from-emerald-50 to-emerald-100/30';
+    const borderTheme = isParenthesesCard ? 'border-amber-200/60' : 'border-emerald-200/60';
+
+    html = `
+      <div class="flip-card h-80 sm:h-96 cursor-pointer" onclick="flipCard(${idx})">
+        <div class="flip-card-inner shadow-sm rounded-3xl border ${borderTheme} bg-white transition-all duration-500 relative h-full" id="fc-inner-${idx}">
+          <!-- 앞면 -->
+          <div class="flip-card-front p-7 flex flex-col justify-between rounded-3xl bg-gradient-to-br ${cardTheme} h-full">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-black tracking-widest text-slate-500 uppercase">${isParenthesesCard ? 'Fill in the blanks ✏️' : 'Flashcard Oral 💡'}</span>
+              ${isSolved ? '<span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2.5 py-1 rounded-full border border-emerald-200">완료 ✓</span>' : ''}
+            </div>
+            <div class="text-slate-800 font-black text-center text-base md:text-lg my-auto px-4 leading-snug">
+              ${q.img ? `<img src="${q.img}" class="max-h-40 mx-auto mb-4 rounded-xl shadow-md border border-white/50">` : ''}
+              ${q.q}
+            </div>
+            <div class="text-[10px] text-slate-400 text-center font-bold animate-pulse tracking-wide">TAP TO FLIP 🔄</div>
+          </div>
+          <!-- 뒷면 -->
+          <div class="flip-card-back p-7 flex flex-col justify-between rounded-3xl bg-slate-700 text-white h-full">
+            <div class="flex items-center justify-between border-b border-slate-600 pb-3">
+              <span class="text-[10px] font-black text-sky-300 uppercase tracking-widest">Model Answer</span>
+            </div>
+            <div class="text-sm md:text-base leading-relaxed text-left my-auto text-slate-100 whitespace-pre-line font-medium overflow-y-auto no-scrollbar py-4">${q.ans}</div>
+            <div class="text-[10px] text-sky-300/80 text-center font-black uppercase tracking-wider">TAP TO RETURN</div>
+          </div>
+        </div>
+      </div>
+    `;
+  } else if (viewMode === 'sa') {
+    const savedGrade = subSolvedStatus[q.id];
+    let statusBadge = '';
+    if (savedGrade === 'perfect') statusBadge = `<span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2.5 py-1 rounded-full border border-emerald-200">완벽히 암기함 🌟</span>`;
+    else if (savedGrade === 'partial') statusBadge = `<span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2.5 py-1 rounded-full border border-amber-200">부분 기억함 👍</span>`;
+    else if (savedGrade === 'needs_review') statusBadge = `<span class="bg-rose-100 text-rose-800 text-[10px] font-bold px-2.5 py-1 rounded-full border border-rose-200">복습 필요 🔁</span>`;
+
+    html = `
+      <div class="bg-white rounded-3xl p-7 border border-slate-200 shadow-sm space-y-6" id="card-${q.id}">
+        <div class="flex items-center justify-between">
+          <span class="text-[10px] bg-sky-100 text-sky-600 px-3 py-1 rounded-full font-black uppercase tracking-widest">${q.cat}</span>
+          <div id="grade-badge-container-${q.id}">${statusBadge}</div>
+        </div>
+        <h4 class="font-black text-slate-800 leading-tight text-base md:text-lg q-text">${q.q}</h4>
+        <textarea id="user-ans-${q.id}" rows="4"
+          class="w-full p-4 rounded-2xl border border-slate-100 bg-slate-50 focus:bg-white focus:border-sky-300 focus:ring-1 focus:ring-sky-200 text-sm font-semibold text-slate-700 outline-none transition resize-none"
+          placeholder="Type keywords here..."></textarea>
+        <button id="btn-check-${q.id}" onclick="checkSubjectiveAnswer('${q.id}')"
+          class="w-full bg-slate-400 text-white font-black py-4 px-4 rounded-2xl text-xs hover:bg-slate-500 transition active:scale-[0.98] ${isSolved ? 'opacity-50' : ''}" ${isSolved ? 'disabled' : ''}>
+          🔍 ANALYZE KEYWORDS
+        </button>
+        <div id="match-result-${q.id}" class="space-y-2"></div>
+        <div id="model-ans-${q.id}" class="mt-4 p-6 rounded-2xl border-l-4 bg-sky-50 border-sky-200 ${isSolved ? '' : 'hidden'} shadow-inner">
+          <div class="font-black text-[10px] uppercase tracking-widest text-sky-600 mb-2.5">✓ MODEL REFERENCE</div>
+          <p class="font-semibold text-slate-800 text-sm leading-relaxed">${q.ans}</p>
+          <div id="grade-panel-${q.id}" class="mt-5 pt-5 border-t border-sky-100/50 flex flex-wrap gap-2.5">
+            <button onclick="gradeSubjective('${q.id}', 'perfect')" class="flex-1 bg-white hover:bg-emerald-50 text-emerald-600 border border-emerald-100 font-bold px-3 py-2 rounded-xl text-[10px] transition">🌟 PERFECT</button>
+            <button onclick="gradeSubjective('${q.id}', 'partial')" class="flex-1 bg-white hover:bg-amber-50 text-amber-600 border border-amber-100 font-bold px-3 py-2 rounded-xl text-[10px] transition">👍 GOOD</button>
+            <button onclick="gradeSubjective('${q.id}', 'needs_review')" class="flex-1 bg-white hover:bg-rose-50 text-rose-600 border border-rose-100 font-bold px-3 py-2 rounded-xl text-[10px] transition">🔁 REVIEW</button>
+          </div>
+        </div>
+      </div>
+    `;
+  } else {
+    // MCQ - Already handled in previous step, but adding qId for safety
+    html = `
+      <div class="bg-white rounded-3xl p-7 border border-slate-200 shadow-sm relative overflow-hidden" id="card-${q.id}">
+        <div class="flex items-center justify-between mb-5">
+          <span class="text-[10px] bg-sky-100 text-sky-600 px-3 py-1 rounded-full font-black uppercase tracking-widest">${q.cat || 'MCQ'}</span>
+          ${isSolved ? '<span class="bg-emerald-50 text-emerald-600 text-[10px] font-bold px-2.5 py-1 rounded-full border border-emerald-100">완료 ✓</span>' : ''}
+        </div>
+        <h4 class="font-black text-slate-800 leading-tight mb-7 text-base md:text-lg q-text">${q.q}</h4>
+        <div class="space-y-3.5 ${isSolved ? 'solved' : ''}" id="opts-container-${q.id}">
+          ${q.opts.map((opt, oidx) => {
+            let btnClass = 'bg-slate-50 border-slate-100 text-slate-700 active:scale-[0.98]';
+            let labelClass = 'bg-slate-200 text-slate-500';
+            if (isSolved) {
+              if (oidx === q.ans) {
+                btnClass = 'bg-emerald-100 text-emerald-700 border-emerald-200 shadow-xs';
+                labelClass = 'bg-emerald-200 text-emerald-700';
+              } else {
+                btnClass = 'bg-slate-50 text-slate-400 opacity-60 border-slate-100';
+              }
+            }
+            return `
+              <button onclick="handleAnswer('${q.id}', ${oidx})"
+                class="w-full text-left p-4.5 rounded-2xl border font-bold transition-all duration-200 flex items-start gap-4 text-sm relative ${btnClass}"
+                id="btn-${q.id}-${oidx}" ${isSolved ? 'disabled' : ''}>
+                <span class="inline-flex items-center justify-center w-7 h-7 rounded-xl text-xs font-black shrink-0 ${labelClass}">${String.fromCharCode(65 + oidx)}</span>
+                <span class="flex-1 pt-0.5 opt-text">${opt}</span>
+              </button>
+            `;
+          }).join('')}
+        </div>
+        <div class="mt-7 p-6 rounded-2xl border-l-4 bg-emerald-50 border-emerald-200 ${isSolved ? '' : 'hidden'} text-emerald-900 shadow-inner" id="explanation-${qId}">
+          <div class="font-black text-[10px] uppercase tracking-widest text-emerald-600 mb-2.5">✓ SYSTEM ANALYSIS</div>
+          <p class="font-medium leading-relaxed text-xs md:text-sm exp-text">${q.exp}</p>
+        </div>
+      </div>
+    `;
+  }
+
+  container.innerHTML = html;
+
+  // 스와이프 이벤트 리스너 등록
+  const cardElem = container.firstChild;
+  cardElem.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX);
+  cardElem.addEventListener('touchend', e => {
+    touchEndX = e.changedTouches[0].screenX;
+    handleSwipe();
+  });
+}
+
+function handleSwipe() {
+  const swipeThreshold = 50;
+  if (touchEndX < touchStartX - swipeThreshold) {
+    nextQuestion();
+  } else if (touchEndX > touchStartX + swipeThreshold) {
+    prevQuestion();
+  }
+}
+
+function updateNavigation() {
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+
+  prevBtn.disabled = currentIndex === 0;
+  prevBtn.classList.toggle('opacity-50', currentIndex === 0);
+
+  if (currentIndex === currentQuestionsList.length - 1) {
+    nextBtn.innerHTML = '결과 보기 🏁';
+    nextBtn.className = "flex-[2] bg-indigo-300 text-white font-black py-4 px-4 rounded-2xl text-xs hover:bg-indigo-400 transition shadow-sm flex items-center justify-center gap-2 active:scale-95";
+  } else {
+    nextBtn.innerHTML = '다음 문제 <span>→</span>';
+    nextBtn.className = "flex-[2] bg-slate-400 text-white font-black py-4 px-4 rounded-2xl text-xs hover:bg-slate-500 transition shadow-sm flex items-center justify-center gap-2 active:scale-95";
+  }
+}
+
+function updateProgressBar() {
+  const total = currentQuestionsList.length;
+  if (total === 0) return;
+
+  const progress = ((currentIndex + 1) / total) * 100;
+  document.getElementById('quizProgressBar').style.width = `${progress}%`;
+  document.getElementById('quizProgressText').textContent = `Question ${currentIndex + 1} / ${total}`;
+  document.getElementById('quizPercentText').textContent = `${Math.round(progress)}%`;
+
+  // 점 인디케이터 업데이트
+  const dotsContainer = document.getElementById('progressDots');
+  if (total <= 20) {
+    dotsContainer.classList.remove('hidden');
+    let dotsHtml = '';
+    for (let i = 0; i < total; i++) {
+      const qId = currentQuestionsList[i].id;
+      const isSolved = solvedList.has(qId);
+      const isActive = i === currentIndex;
+      dotsHtml += `<div class="dot ${isActive ? 'active' : ''} ${isSolved ? 'solved' : ''}"></div>`;
+    }
+    dotsContainer.innerHTML = dotsHtml;
+  } else {
+    dotsContainer.classList.add('hidden');
+  }
+}
+
+function nextQuestion() {
+  if (currentIndex < currentQuestionsList.length - 1) {
+    currentIndex++;
+    render();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } else {
+    showResult();
+  }
+}
+
+function prevQuestion() {
+  if (currentIndex > 0) {
+    currentIndex--;
+    render();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+function showResult() {
+  const quizArea = document.getElementById('quizArea');
+  const resultArea = document.getElementById('resultArea');
+  const visualSchematics = document.getElementById('visualSchematics');
+
+  quizArea.classList.add('hidden');
+  if (visualSchematics) visualSchematics.classList.add('hidden');
+  resultArea.classList.remove('hidden');
+
+  // 통계 계산
+  const total = currentQuestionsList.length;
+  let solvedInSession = 0;
+  currentQuestionsList.forEach(q => {
+    if (solvedList.has(q.id)) solvedInSession++;
+  });
+
+  document.getElementById('resTotal').textContent = total;
+  document.getElementById('resSolved').textContent = solvedInSession;
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 // 카테고리 필터링 조작기
 function setCategory(cat) {
   currentCategory = cat;
-  currentRandomList = []; // Reset random cache if user changes category
+  currentIndex = 0; // 카테고리 변경 시 인덱스 초기화
+  currentRandomList = [];
   
   // Update Category Tab Styling
   document.querySelectorAll('.cat-tab').forEach(t => {
@@ -1016,7 +1327,7 @@ function setCategory(cat) {
   });
   const activeTab = document.getElementById('cat-' + cat);
   if (activeTab) {
-    activeTab.className = "cat-tab px-3 py-1.5 text-xs font-extrabold rounded-full text-white bg-blue-600 shadow-sm whitespace-nowrap transition";
+    activeTab.className = "cat-tab px-3 py-1.5 text-xs font-extrabold rounded-full text-white bg-sky-400 shadow-sm whitespace-nowrap transition";
   }
   render();
 }
@@ -1024,7 +1335,8 @@ function setCategory(cat) {
 // 학습 모드 조작기
 function setMode(mode) {
   viewMode = mode;
-  
+  currentIndex = 0; // 모드 변경 시 인덱스 초기화
+
   // Update Mode Tab Styling
   document.querySelectorAll('.mode-tab').forEach(t => {
     t.className = "mode-tab px-3 py-1 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap transition";
@@ -1032,11 +1344,11 @@ function setMode(mode) {
   const activeTab = document.getElementById('mode-' + mode);
   if (activeTab) {
     if (mode === 'mcq') {
-      activeTab.className = "mode-tab px-3 py-1 text-xs font-extrabold rounded-full text-white bg-blue-600 border border-blue-600 shadow-sm whitespace-nowrap transition";
+      activeTab.className = "mode-tab px-3 py-1 text-xs font-extrabold rounded-full text-white bg-sky-400 border border-sky-300 shadow-sm whitespace-nowrap transition";
     } else if (mode === 'sa') {
-      activeTab.className = "mode-tab px-3 py-1 text-xs font-extrabold rounded-full text-white bg-sky-600 border border-sky-600 shadow-sm whitespace-nowrap transition";
+      activeTab.className = "mode-tab px-3 py-1 text-xs font-extrabold rounded-full text-white bg-indigo-300 border border-indigo-200 shadow-sm whitespace-nowrap transition";
     } else if (mode === 'fc') {
-      activeTab.className = "mode-tab px-3 py-1 text-xs font-extrabold rounded-full text-white bg-emerald-600 border border-emerald-600 shadow-sm whitespace-nowrap transition";
+      activeTab.className = "mode-tab px-3 py-1 text-xs font-extrabold rounded-full text-white bg-emerald-300 border border-emerald-200 shadow-sm whitespace-nowrap transition";
     }
   }
   render();
@@ -1059,24 +1371,31 @@ function selectCategory(cat) {
 
 // 랜덤 20문제 실행기
 function startRandomQuiz() {
+  renderRandom();
+}
+
+// 🎲 랜덤 중복 방지 기반 엄선 20제 추출 알고리즘
+function renderRandom() {
+  currentIndex = 0; // 랜덤 시작 시 인덱스 초기화
   currentCategory = 'random';
   viewMode = 'mcq';
-  currentRandomList = []; // 버튼 클릭 시 명시적으로 이전 무작위 리스트 초기화 -> 매번 새로운 조합 생성 가능
-  
-  // Reset navigation tabs
-  document.querySelectorAll('.cat-tab').forEach(t => {
-    t.className = "cat-tab px-3 py-1.5 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap transition";
-  });
-  document.querySelectorAll('.mode-tab').forEach(t => {
-    t.className = "mode-tab px-3 py-1.5 text-xs font-extrabold rounded-lg text-slate-500 hover:bg-slate-100 whitespace-nowrap transition";
-  });
-  
-  const mcqTab = document.getElementById('mode-mcq');
-  if (mcqTab) {
-    mcqTab.className = "mode-tab px-3 py-1.5 text-xs font-extrabold rounded-lg text-white bg-blue-600 border border-blue-600 shadow-sm whitespace-nowrap transition";
+
+  const allMCQs = [...SYSTEM_QUIZ_DATA.lim, ...SYSTEM_QUIZ_DATA.norm, ...SYSTEM_QUIZ_DATA.weather, ...SYSTEM_QUIZ_DATA.nonnorm];
+  let unsolvedMCQs = allMCQs.filter(q => !solvedList.has(q.id));
+  let selected = [];
+
+  if (unsolvedMCQs.length >= 20) {
+    selected = unsolvedMCQs.sort(() => 0.5 - Math.random()).slice(0, 20);
+  } else {
+    selected = [...unsolvedMCQs];
+    const solvedMCQs = allMCQs.filter(q => solvedList.has(q.id));
+    const shuffledSolved = solvedMCQs.sort(() => 0.5 - Math.random());
+    selected = selected.concat(shuffledSolved.slice(0, 20 - unsolvedMCQs.length));
+    selected = selected.sort(() => 0.5 - Math.random());
   }
-  
-  renderRandom();
+
+  currentRandomList = selected;
+  render();
 }
 
 // 점수/풀이 리셋
@@ -1163,295 +1482,6 @@ function getCategoryLabel(cat) {
   return labels[cat] || '전체보기';
 }
 
-// 퀴즈 렌더링 엔진
-function render() {
-  const container = document.getElementById('quizContainer');
-  container.innerHTML = '';
-
-  // 1. 카테고리 필터에 부합하는 주관식 리스트 분할 추출
-  let saQuestions = [];
-  if (currentCategory === 'all') {
-    saQuestions = SUBJECTIVE_QUIZ_DATA;
-  } else if (currentCategory === 'random') {
-    saQuestions = SUBJECTIVE_QUIZ_DATA; // 랜덤은 객관식만 수행하므로 폴백 보장
-  } else {
-    saQuestions = SUBJECTIVE_QUIZ_DATA.filter(q => q.cat === currentCategory);
-  }
-
-  // 2. 카테고리 필터에 부합하는 플래시카드 리스트 분할 추출
-  let fcQuestions = [];
-  if (currentCategory === 'all') {
-    fcQuestions = FLASHCARD_DATA;
-  } else if (currentCategory === 'random') {
-    fcQuestions = FLASHCARD_DATA;
-  } else {
-    fcQuestions = FLASHCARD_DATA.filter(q => q.cat === currentCategory);
-  }
-
-  // 상단 스키매틱 뷰의 표시 조건 제어 (전체보기 및 Limitation 카테고리의 객관식 모드일 때만 표시)
-  const visualSchematics = document.getElementById('visualSchematics');
-  if (visualSchematics) {
-    if ((currentCategory === 'all' || currentCategory === 'lim') && viewMode === 'mcq') {
-      visualSchematics.classList.remove('hidden');
-    } else {
-      visualSchematics.classList.add('hidden');
-    }
-  }
-
-  // 3. 플래시카드 렌더링
-  if (viewMode === 'fc') {
-    let html = `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">`;
-    if (fcQuestions.length === 0) {
-      html += `
-        <div class="bg-white rounded-xl p-8 text-center text-slate-400 border border-slate-200 col-span-2 shadow-xs">
-          <span class="text-3xl">📂</span>
-          <p class="mt-2 text-xs font-bold">선택하신 카테고리에 플래시카드가 배정되어 있지 않습니다.</p>
-        </div>
-      `;
-    } else {
-      fcQuestions.forEach((card, idx) => {
-        const isParenthesesCard = card.q.includes('❓');
-        const cardTheme = isParenthesesCard ? 'from-amber-50 to-amber-100/30' : 'from-emerald-50 to-emerald-100/30';
-        const borderTheme = isParenthesesCard ? 'border-amber-200/60' : 'border-emerald-200/60';
-        const isSolved = solvedList.has(card.id);
-        
-        html += `
-          <div class="flip-card h-52 cursor-pointer" id="fc-${idx}" onclick="flipCard(${idx})">
-            <div class="flip-card-inner shadow-xs rounded-2xl border ${borderTheme} bg-white transition-all duration-500 relative h-full">
-              <!-- 앞면 (질문) -->
-              <div class="flip-card-front p-4 flex flex-col justify-between rounded-2xl bg-gradient-to-br ${cardTheme} h-full">
-                <div class="flex items-center justify-between">
-                  <span class="text-[9px] font-black tracking-wider text-slate-500 uppercase">${isParenthesesCard ? 'Parentheses Fill ✏️' : 'Flashcard [Oral] 💡'}</span>
-                  <div class="flex items-center gap-1.5">
-                    ${isSolved ? '<span class="bg-emerald-100 text-emerald-800 text-[8px] font-bold px-1.5 py-0.5 rounded-md">✓ 완료</span>' : ''}
-                    <span class="text-xs text-slate-400 font-mono font-bold">#${idx + 1}</span>
-                  </div>
-                </div>
-                <div class="text-slate-800 font-extrabold text-center text-xs md:text-sm my-auto px-2 leading-relaxed">${card.q}</div>
-                <div class="text-[9px] text-slate-400 text-center font-bold">탭하여 모범 정답 뒤집기 🔄</div>
-              </div>
-              <!-- 뒷면 (정답) -->
-              <div class="flip-card-back p-4 flex flex-col justify-between rounded-2xl bg-slate-900 text-white h-full">
-                <div class="flex items-center justify-between border-b border-slate-800 pb-1.5">
-                  <span class="text-[9px] font-bold text-sky-400 uppercase">Answer Sheet</span>
-                  <span class="text-xs text-slate-500 font-mono font-bold">#${idx + 1}</span>
-                </div>
-                <div class="text-xs leading-relaxed text-left my-auto text-slate-200 whitespace-pre-line font-medium overflow-y-auto no-scrollbar py-2 max-h-[120px]">${card.ans}</div>
-                <div class="text-[8px] text-sky-400/80 text-center font-extrabold">확인 완료 💡</div>
-              </div>
-            </div>
-          </div>
-        `;
-      });
-    }
-    html += `</div>`;
-    container.innerHTML = html;
-    return;
-  }
-
-  // 4. 주관식 평가 렌더링
-  if (viewMode === 'sa') {
-    let html = `
-      <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-4">
-        <h2 class="font-black text-slate-800 text-base flex items-center gap-2">
-          <span class="inline-block w-2 h-4 bg-sky-500 rounded-sm"></span>
-          ✍️ 주관식 키워드 매칭 평가 (${saQuestions.length}문항)
-        </h2>
-        <span class="text-[10px] bg-slate-100 text-slate-500 px-3 py-1 rounded-full font-bold">AI 키워드 진단</span>
-      </div>
-    `;
-
-    if (saQuestions.length === 0) {
-      html += `
-        <div class="bg-white rounded-xl p-8 text-center text-slate-400 border border-slate-200 shadow-xs">
-          <span class="text-3xl">📂</span>
-          <p class="mt-2 text-xs font-bold">선택하신 카테고리에 주관식 평가 문항이 배정되어 있지 않습니다.</p>
-        </div>
-      `;
-    } else {
-      saQuestions.forEach((q, qidx) => {
-        const isSolved = solvedList.has(q.id);
-        const savedGrade = subSolvedStatus[q.id];
-        let statusBadge = '';
-        if (savedGrade === 'perfect') statusBadge = `<span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-200">완벽히 암기함 🌟</span>`;
-        else if (savedGrade === 'partial') statusBadge = `<span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-200">부분 기억함 👍</span>`;
-        else if (savedGrade === 'needs_review') statusBadge = `<span class="bg-rose-100 text-rose-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-rose-200">복습 필요 🔁</span>`;
-
-        html += `
-          <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm space-y-4 relative" id="card-${q.id}">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <span class="text-[9px] bg-sky-900 text-sky-100 px-2 py-0.5 rounded-full font-mono font-bold">SA ${qidx + 1}</span>
-                <span class="text-[9px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">${q.cat.toUpperCase()}</span>
-              </div>
-              <div id="grade-badge-container-${q.id}">${statusBadge}</div>
-            </div>
-            
-            <!-- 주관식 질문 -->
-            <h4 class="font-extrabold text-slate-800 leading-relaxed q-text">${q.q}</h4>
-            
-            <!-- 입력 텍스트 영역 -->
-            <div>
-              <textarea id="user-ans-${q.id}" rows="3" 
-                class="w-full p-3 rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 text-xs font-semibold text-slate-700 outline-none transition resize-none"
-                placeholder="여기에 생각하신 정답 및 필수 수치/키워드를 자유롭게 작성해 보세요..."></textarea>
-            </div>
-
-            <!-- 검증 버튼 -->
-            <div class="flex justify-between items-center gap-2">
-              <button id="btn-check-${q.id}" onclick="checkSubjectiveAnswer('${q.id}')"
-                class="bg-slate-900 text-white hover:bg-slate-800 font-bold py-1.5 px-4 rounded-lg text-xs transition ${isSolved ? 'opacity-50 cursor-not-allowed' : ''}" ${isSolved ? 'disabled' : ''}>
-                🔍 정답 및 키워드 매칭 분석
-              </button>
-            </div>
-
-            <!-- 스캔된 키워드 & 모범 답안 프레임 -->
-            <div id="match-result-${q.id}" class="space-y-2"></div>
-
-            <div id="model-ans-${q.id}" class="mt-4 p-4 rounded-xl border-l-4 bg-sky-50 border-sky-500 ${isSolved ? '' : 'hidden'} shadow-inner">
-              <div class="font-black text-[11px] uppercase tracking-wider text-sky-700 mb-1">✓ MODEL REFERENCE MATRIX</div>
-              <p class="font-semibold text-slate-800 text-xs leading-relaxed">${q.ans}</p>
-              
-              <!-- 자가 채점 선택기 -->
-              <div id="grade-panel-${q.id}" class="mt-3 pt-3 border-t border-sky-200/50 flex flex-wrap items-center gap-2">
-                <span class="text-[10px] font-bold text-slate-500">자가 진척도 기록:</span>
-                <button onclick="gradeSubjective('${q.id}', 'perfect')" class="bg-white hover:bg-emerald-50 text-emerald-700 border border-slate-200 hover:border-emerald-300 font-bold px-2 py-1 rounded text-[10px] transition">🌟 완벽히 외움</button>
-                <button onclick="gradeSubjective('${q.id}', 'partial')" class="bg-white hover:bg-amber-50 text-amber-700 border border-slate-200 hover:border-amber-300 font-bold px-2 py-1 rounded text-[10px] transition">👍 대략 기억함</button>
-                <button onclick="gradeSubjective('${q.id}', 'needs_review')" class="bg-white hover:bg-rose-50 text-rose-700 border border-slate-200 hover:border-rose-300 font-bold px-2 py-1 rounded text-[10px] transition">🔁 복습 필요</button>
-              </div>
-            </div>
-          </div>
-        `;
-      });
-    }
-    html += `</div>`;
-    container.innerHTML = html;
-    return;
-  }
-
-  // 5. 객관식 모드 렌더링
-  let targetQuestions = [];
-  if (currentCategory === 'all') {
-    targetQuestions = [...SYSTEM_QUIZ_DATA.lim, ...SYSTEM_QUIZ_DATA.norm, ...SYSTEM_QUIZ_DATA.weather, ...SYSTEM_QUIZ_DATA.nonnorm];
-  } else if (currentCategory === 'random') {
-    targetQuestions = currentRandomList;
-  } else {
-    targetQuestions = SYSTEM_QUIZ_DATA[currentCategory] || [];
-  }
-
-  renderQuestionList(targetQuestions, getCategoryLabel(currentCategory));
-}
-
-// 🎲 랜덤 중복 방지 기반 엄선 20제 추출 알고리즘
-function renderRandom() {
-  const container = document.getElementById('quizContainer');
-  
-  // 만약 이미 세션 내에 생성한 무작위 보존 리스트가 없다면 새로 추출
-  if (currentRandomList.length === 0) {
-    const allMCQs = [...SYSTEM_QUIZ_DATA.lim, ...SYSTEM_QUIZ_DATA.norm, ...SYSTEM_QUIZ_DATA.weather, ...SYSTEM_QUIZ_DATA.nonnorm];
-    
-    // 미풀이 문제만 추출 (solvedList에 없는 것들)
-    let unsolvedMCQs = allMCQs.filter(q => !solvedList.has(q.id));
-    let selected = [];
-    let toastMsg = "";
-
-    if (unsolvedMCQs.length >= 20) {
-      // 미풀이 문제가 20개 이상 남아있는 경우 -> 순수한 미풀이 20문항만 엄선 출제
-      const shuffled = unsolvedMCQs.sort(() => 0.5 - Math.random());
-      selected = shuffled.slice(0, 20);
-    } else if (unsolvedMCQs.length > 0) {
-      // 미풀이 문제가 존재하지만 20개 미만으로 남은 경우 -> 미풀이를 몽땅 넣고, 부족한 수량만 풀었던 문제에서 충당
-      selected = [...unsolvedMCQs];
-      const solvedMCQs = allMCQs.filter(q => solvedList.has(q.id));
-      const shuffledSolved = solvedMCQs.sort(() => 0.5 - Math.random());
-      const needCount = 20 - unsolvedMCQs.length;
-      
-      selected = selected.concat(shuffledSolved.slice(0, needCount));
-      // 전체적으로 최종 순서 무작위 셔플
-      selected = selected.sort(() => 0.5 - Math.random());
-    } else {
-      // 모든 문제를 최소 1회 완독한 경우 -> 복습을 위한 전체 무작위 20문항 출제
-      const shuffled = allMCQs.sort(() => 0.5 - Math.random());
-      selected = shuffled.slice(0, 20);
-    }
-
-    currentRandomList = selected;
-  }
-
-  renderQuestionList(currentRandomList, "🎲 랜덤 엄선 20제");
-}
-
-function renderQuestionList(list, subtitle) {
-  const container = document.getElementById('quizContainer');
-  let html = `
-    <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-4">
-      <h2 class="font-black text-slate-800 text-base flex items-center gap-2">
-        <span class="inline-block w-2 h-4 bg-sky-500 rounded-sm"></span>
-        ${subtitle} (${list.length}문항)
-      </h2>
-      <span class="text-[10px] bg-slate-100 text-slate-500 px-3 py-1 rounded-full font-bold">진척도 추적 적용</span>
-    </div>
-  `;
-
-  list.forEach((q, qidx) => {
-    const qId = q.id;
-    const isSolved = solvedList.has(qId);
-    
-    html += `
-      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs transition hover:shadow-sm relative overflow-hidden" id="card-${qId}">
-        <div class="flex items-center gap-2 mb-3">
-          <span class="text-[9px] bg-slate-900 text-slate-100 px-2 py-0.5 rounded-full font-mono font-bold">Q${qidx + 1}</span>
-          <span class="text-[9px] bg-sky-100 text-sky-700 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Memo Core</span>
-          ${isSolved ? '<span class="bg-emerald-100 text-emerald-800 text-[9px] font-bold px-2 py-0.5 rounded-full">완료 ✓</span>' : ''}
-        </div>
-        
-        <!-- 문제 본문 -->
-        <h4 class="font-extrabold text-slate-800 leading-relaxed mb-4 q-text">${q.q}</h4>
-        
-        <!-- 오지선다 버튼 프레임 -->
-        <div class="space-y-2.5 ${isSolved ? 'solved' : ''}" id="opts-container-${qId}">
-          ${q.opts.map((opt, oidx) => {
-            // 이미 풀었을 때 렌더링 상태 보존
-            let btnClass = 'bg-slate-50 hover:bg-slate-100 hover:border-slate-300 text-slate-700';
-            let labelClass = 'bg-slate-200 text-slate-600';
-            let iconMarkup = '';
-            let disabledAttr = '';
-
-            if (isSolved) {
-              disabledAttr = 'disabled';
-              if (oidx === q.ans) {
-                btnClass = 'bg-emerald-500 text-white border-emerald-600';
-                labelClass = 'bg-emerald-600 text-emerald-50';
-                iconMarkup = `<span class="absolute right-4 top-1/2 -translate-y-1/2 font-black text-white text-sm">✓</span>`;
-              } else {
-                btnClass = 'bg-slate-50 text-slate-700 opacity-40';
-              }
-            }
-
-            return `
-              <button onclick="handleAnswer('${qId}', ${oidx})" 
-                class="w-full text-left p-3.5 rounded-xl border border-slate-200 font-semibold transition flex items-start gap-3 opt-text relative ${btnClass}"
-                id="btn-${qId}-${oidx}" ${disabledAttr}>
-                <span class="inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-black shrink-0 mt-0.5 ${labelClass}">${String.fromCharCode(65 + oidx)}</span>
-                <span class="flex-1">${opt}</span>
-                ${iconMarkup}
-              </button>
-            `;
-          }).join('')}
-        </div>
-        
-        <!-- 해설 패널 -->
-        <div class="mt-4 p-4 rounded-xl border-l-4 bg-emerald-50 border-emerald-500 ${isSolved ? '' : 'hidden'} text-emerald-950 text-xs shadow-inner" id="explanation-${qId}">
-          <div class="font-black text-[11px] uppercase tracking-wider text-emerald-700 mb-1">✓ SYSTEM REFERENCE MATRIX</div>
-          <p class="font-medium leading-relaxed exp-text">${q.exp}</p>
-        </div>
-      </div>
-    `;
-  });
-
-  container.innerHTML = html;
-}
-
 function handleAnswer(qId, selectedIdx) {
   const container = document.getElementById(`opts-container-${qId}`);
   if (container.classList.contains('solved')) return;
@@ -1464,9 +1494,10 @@ function handleAnswer(qId, selectedIdx) {
   const explanationPanel = document.getElementById(`explanation-${qId}`);
 
   if (selectedIdx === correctIdx) {
-    selectedBtn.classList.remove('bg-slate-50', 'hover:bg-slate-100');
-    selectedBtn.classList.add('bg-emerald-500', 'text-white', 'border-emerald-600');
-    selectedBtn.querySelector('span').classList.add('bg-emerald-600', 'text-emerald-50');
+    selectedBtn.classList.remove('bg-slate-50');
+    selectedBtn.classList.add('bg-emerald-100', 'text-emerald-700', 'border-emerald-200');
+    selectedBtn.querySelector('span').classList.remove('bg-slate-200', 'text-slate-500');
+    selectedBtn.querySelector('span').classList.add('bg-emerald-200', 'text-emerald-700');
     selectedBtn.innerHTML += `<span class="absolute right-4 top-1/2 -translate-y-1/2 font-black text-white text-sm">✓</span>`;
     
     container.classList.add('solved');
@@ -1480,11 +1511,12 @@ function handleAnswer(qId, selectedIdx) {
     }
     
     markSolved(qId);
+    updateProgressBar();
   } else {
-    selectedBtn.classList.remove('bg-slate-50', 'hover:bg-slate-100');
-    selectedBtn.classList.add('bg-rose-500', 'text-white', 'border-rose-600');
-    selectedBtn.querySelector('span').classList.add('bg-rose-600', 'text-rose-50');
-    selectedBtn.innerHTML += `<span class="absolute right-4 top-1/2 -translate-y-1/2 font-black text-white text-sm">✗</span>`;
+    selectedBtn.classList.remove('bg-slate-50');
+    selectedBtn.classList.add('bg-rose-100', 'text-rose-700', 'border-rose-200');
+    selectedBtn.querySelector('span').classList.remove('bg-slate-200', 'text-slate-500');
+    selectedBtn.querySelector('span').classList.add('bg-rose-200', 'text-rose-700');
     selectedBtn.disabled = true;
   }
 }
@@ -1532,16 +1564,18 @@ function checkSubjectiveAnswer(id) {
   btn.classList.add('opacity-50', 'cursor-not-allowed');
   
   markSolved(id);
+  updateProgressBar();
 }
 
 function flipCard(idx) {
-  const card = document.getElementById(`fc-${idx}`);
-  card.classList.toggle('flipped');
+  const inner = document.getElementById(`fc-inner-${idx}`);
+  if (inner) inner.classList.toggle('flipped');
   
   // 카드를 뒤집었을 때(학습 확인) 자동으로 풀이 기록에 누적 등록
-  const qId = FLASHCARD_DATA[idx].id;
+  const qId = currentQuestionsList[idx].id;
   if (!solvedList.has(qId)) {
     markSolved(qId);
+    updateProgressBar();
   }
 }
 
