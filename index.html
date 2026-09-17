@@ -156,7 +156,7 @@ body {
 </nav>
 
 <!-- ── MAIN AREA ── -->
-<main class="flex-1 max-w-4xl w-full mx-auto p-3 md:py-6">
+<main class="flex-1 max-w-4xl w-full mx-auto p-3 pb-28 md:py-6 md:pb-32">
   <!-- 메인 질문 영역 로더 -->
   <div id="quizArea" class="hidden">
     <!-- 상단 진행바 -->
@@ -177,13 +177,15 @@ body {
     <div id="quizContainer" class="card-fade-in"></div>
 
     <!-- 내비게이션 컨트롤 -->
-    <div class="mt-6 flex items-center justify-between gap-3 px-1">
-      <button onclick="prevQuestion()" id="prevBtn" class="flex-1 bg-white border border-slate-200 text-slate-600 font-bold py-4 px-4 rounded-2xl text-xs hover:bg-slate-50 transition shadow-xs flex items-center justify-center gap-2 active:scale-95">
+    <div class="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200/80 bg-white/90 px-3 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] shadow-[0_-6px_20px_rgba(15,23,42,0.08)] backdrop-blur-md">
+      <div class="mx-auto flex max-w-4xl items-center justify-between gap-4 px-1">
+      <button onclick="prevQuestion()" id="prevBtn" class="w-auto min-w-[108px] bg-white border border-slate-200 text-slate-600 font-bold py-4 px-5 rounded-2xl text-xs hover:bg-slate-50 transition shadow-xs flex items-center justify-center gap-2 active:scale-95">
         <span>←</span> 이전
       </button>
-      <button onclick="nextQuestion()" id="nextBtn" class="flex-[2] bg-slate-400 text-white font-black py-4 px-4 rounded-2xl text-xs hover:bg-slate-500 transition shadow-sm flex items-center justify-center gap-2 active:scale-95">
+      <button onclick="nextQuestion()" id="nextBtn" class="w-auto min-w-[132px] bg-slate-400 text-white font-black py-4 px-5 rounded-2xl text-xs hover:bg-slate-500 transition shadow-sm flex items-center justify-center gap-2 active:scale-95">
         다음 문제 <span>→</span>
       </button>
+      </div>
     </div>
   </div>
 
@@ -1260,10 +1262,10 @@ function updateNavigation() {
 
   if (currentIndex === currentQuestionsList.length - 1) {
     nextBtn.innerHTML = '결과 보기 🏁';
-    nextBtn.className = "flex-[2] bg-blue-300 text-white font-black py-4 px-4 rounded-2xl text-xs hover:bg-blue-400 transition shadow-sm flex items-center justify-center gap-2 active:scale-95";
+    nextBtn.className = "w-auto min-w-[132px] bg-blue-300 text-white font-black py-4 px-5 rounded-2xl text-xs hover:bg-blue-400 transition shadow-sm flex items-center justify-center gap-2 active:scale-95";
   } else {
     nextBtn.innerHTML = '다음 문제 <span>→</span>';
-    nextBtn.className = "flex-[2] bg-slate-400 text-white font-black py-4 px-4 rounded-2xl text-xs hover:bg-slate-500 transition shadow-sm flex items-center justify-center gap-2 active:scale-95";
+    nextBtn.className = "w-auto min-w-[132px] bg-slate-400 text-white font-black py-4 px-5 rounded-2xl text-xs hover:bg-slate-500 transition shadow-sm flex items-center justify-center gap-2 active:scale-95";
   }
 }
 
