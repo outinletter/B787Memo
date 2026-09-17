@@ -352,7 +352,7 @@ const SYSTEM_QUIZ_DATA = {
     },
     {
       id: "mcq-norm-2",
-      q: "VMC 저고도 접근 중 통합 접근 항법(IAN)의 오경보로 인해 'GLIDESLOPE' 음성 경고가 울릴 경우, 경고음을 끄기(Silence) 위한 유일하게 가용한 조치 스위치는 무엇입니까? (KAL-43R1)",
+      q: "VMC 저고도 접근 중 통합 접근 항법(IAN)의 오경보로 인해 'GLIDESLOPE' 음성 경보가 울릴 경우, 경고음을 끄기(Silence) 위한 유일하게 가용한 조치 스위치는 무엇입니까? (KAL-43R1)",
       opts: [
         "주 조종석 정면의 오디오 컨트롤 패널(ACP) 'AURAL CANCEL' 스위치 조작",
         "오버헤드 중앙 패널 트랜스폰더 좌측에 장착된 'BELOW G/S (G/S INHIBIT)' 스위치 조작",
@@ -628,7 +628,7 @@ const SYSTEM_QUIZ_DATA = {
         "화재 스위치 풀(Pull) → 연료 밸브 폐쇄 → 수동 가온 강하"
       ],
       ans: 1,
-      exp: "Dual Eng Fail/Stall의 메모리 아이템은 1) FUEL CONTROL 스위치 양쪽 CUTOFF 후 RUN, 2) RAM AIR TURBINE 스위치를 1초간 길게 눌러 전기/유압 비상 전원 공급, 3) 윈드밀 스타트 기류를 위해 속도를 270 knots 이상으로 유지하는 것입니다."
+      exp: "Dual Eng Fail/Stall의 메모리 아이템은 1) FUEL CONTROL 스위치 양쪽 CUTOFF 후 RUN, 2) RAM AIR TURBINE 스위치를 1초간 길게 눌러 전기/유압 비상 전원 공급, 3) 윈드밀 스타트를 위해 270 knots 이상의 속도를 세팅 및 유지하는 것입니다."
     },
     {
       id: "mcq-nonnorm-5",
@@ -735,7 +735,7 @@ const FLASHCARD_DATA = [
   { id: "fc-24", cat: "norm", q: "In VNAV, if an AUTOPILOT mode fail nuisance trip ( ❓ ) occurs... 에서 가려진 계기 오류 상태 표시는?", ans: "정답: line through\n\n(오토파일럿 모드 결함 시 PFD 해당 지시 문자 위에 그어지는 무효 선 표시입니다.)" },
   { id: "fc-25", cat: "norm", q: "Unwanted 'GLIDESLOPE' Advisory During Approaches On Airplanes ( ❓ ) 에서 가려진 접근 옵션 장치명은?", ans: "정답: KAL-43R1\n\n(통합 접근 항법 IAN 옵션 장착 기종의 불필요 오경보 대응용 뷸레틴 번호입니다.)" },
   { id: "fc-26", cat: "norm", q: "LNAV PATH DEVIATION ( ❓ ) 에서 가려진 선회 각도 합산에 관한 가이드라인은?", ans: "정답: total for all connected turns\n\n(SID 절차 상 가속 제한을 방지하기 위해 연속된 모든 선회각의 합을 의미합니다.)" },
-  { id: "fc-27", cat: "norm", q: "PACK MESSAGES AFTER ENGINE START( ❓ ) 에서 가려진 보잉 정상 절차 장은?", ans: "정답: POM 9.1.17\n\n(시동 후 Y201 소프트웨어 팩 메시지 지연 및 사라짐 특성이 기록된 장입니다.)" },
+  { id: "fc-27", cat: "norm", q: "PACK MESS AFTER ENGINE START( ❓ ) 에서 가려진 보잉 정상 절차 장은?", ans: "정답: POM 9.1.17\n\n(시동 후 Y201 소프트웨어 팩 메시지 지연 및 사라짐 특성이 기록된 장입니다.)" },
   { id: "fc-28", cat: "norm", q: "Expired data has a six-day grace period( ❓ ) 에서 가려진 한글 단어는?", ans: "정답: 유예 기간\n\n(FMS 단말기 데이터 만료 후 정비 업데이트 전까지 비행이 보장되는 법적 기간입니다.)" },
   { id: "fc-29", cat: "norm", q: "Towing Power mode ( ❓ ) 에서 가려진 조업 시 전원 차단 상세 상태명은?", ans: "정답: not energized\n\n(Towing 모드 하에서 조종실 내 무전기 등에 전류가 차단되는 물리적 상태입니다.)" },
   { id: "fc-30", cat: "weather", q: "Return to Land Fuel Jettison Limit Weight ( ❓ ) 에서 가려진 비상 회항 시나리오명은?", ans: "정답: Return to Land\n\n(이륙 직후 비상 회항 시 missed approach 고도 회복 상승성능 유지를 위해 설정하는 중량 한계입니다.)" },
@@ -1026,6 +1026,7 @@ function initializeQuestionsMap() {
     SYSTEM_QUIZ_DATA[cat].forEach(q => {
       if (q.id) {
         ALL_QUESTIONS_MAP[q.id] = q;
+        if (!q.cat) q.cat = cat; // 카테고리 정보 주입
       }
     });
   }
@@ -1107,13 +1108,27 @@ function render() {
   updateProgressBar();
 }
 
+// 카테고리 라벨 맵
+function getCategoryLabel(cat) {
+  const labels = {
+    'all': '전체보기',
+    'lim': 'Limitation',
+    'norm': 'Normal & OMB',
+    'weather': 'Weather & Fuel',
+    'nonnorm': 'Non-Normal',
+    'random': '🎲 랜덤 엄선'
+  };
+  return labels[cat] || cat.toUpperCase();
+}
+
 function renderSingleCard(q, idx, total) {
   const container = document.getElementById('quizContainer');
   container.className = "card-fade-in";
 
   let html = '';
   const isSolved = solvedList.has(q.id);
-  const qId = q.id; // Helper for explanation ID
+  const qId = q.id;
+  const displayCat = getCategoryLabel(q.cat || currentCategory);
 
   if (viewMode === 'fc') {
     const isParenthesesCard = q.q.includes('❓');
@@ -1126,8 +1141,8 @@ function renderSingleCard(q, idx, total) {
           <!-- 앞면 -->
           <div class="flip-card-front p-7 flex flex-col justify-between rounded-3xl bg-gradient-to-br ${cardTheme} h-full">
             <div class="flex items-center justify-between">
-              <span class="text-[10px] font-black tracking-widest text-slate-500 uppercase">${isParenthesesCard ? 'Fill in the blanks ✏️' : 'Flashcard Oral 💡'}</span>
-              ${isSolved ? '<span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2.5 py-1 rounded-full border border-emerald-200">완료 ✓</span>' : ''}
+              <span class="text-[10px] font-black tracking-widest text-slate-500 uppercase">${displayCat}</span>
+              ${isSolved ? '<span class="bg-emerald-50 text-emerald-600 text-[10px] font-bold px-2.5 py-1 rounded-full border border-emerald-100">완료 ✓</span>' : ''}
             </div>
             <div class="text-slate-800 font-black text-center text-base md:text-lg my-auto px-4 leading-snug">
               ${q.img ? `<img src="${q.img}" class="max-h-40 mx-auto mb-4 rounded-xl shadow-md border border-white/50">` : ''}
@@ -1149,14 +1164,14 @@ function renderSingleCard(q, idx, total) {
   } else if (viewMode === 'sa') {
     const savedGrade = subSolvedStatus[q.id];
     let statusBadge = '';
-    if (savedGrade === 'perfect') statusBadge = `<span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2.5 py-1 rounded-full border border-emerald-200">완벽히 암기함 🌟</span>`;
-    else if (savedGrade === 'partial') statusBadge = `<span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2.5 py-1 rounded-full border border-amber-200">부분 기억함 👍</span>`;
-    else if (savedGrade === 'needs_review') statusBadge = `<span class="bg-rose-100 text-rose-800 text-[10px] font-bold px-2.5 py-1 rounded-full border border-rose-200">복습 필요 🔁</span>`;
+    if (savedGrade === 'perfect') statusBadge = `<span class="bg-emerald-50 text-emerald-600 text-[10px] font-bold px-2.5 py-1 rounded-full border border-emerald-100">완벽히 암기함 🌟</span>`;
+    else if (savedGrade === 'partial') statusBadge = `<span class="bg-amber-50 text-amber-800 text-[10px] font-bold px-2.5 py-1 rounded-full border border-amber-100">부분 기억함 👍</span>`;
+    else if (savedGrade === 'needs_review') statusBadge = `<span class="bg-rose-50 text-rose-600 text-[10px] font-bold px-2.5 py-1 rounded-full border border-rose-100">복습 필요 🔁</span>`;
 
     html = `
       <div class="bg-white rounded-3xl p-7 border border-slate-200 shadow-sm space-y-6" id="card-${q.id}">
         <div class="flex items-center justify-between">
-          <span class="text-[10px] bg-sky-100 text-sky-600 px-3 py-1 rounded-full font-black uppercase tracking-widest">${q.cat}</span>
+          <span class="text-[10px] bg-sky-100 text-sky-600 px-3 py-1 rounded-full font-black uppercase tracking-widest">${displayCat}</span>
           <div id="grade-badge-container-${q.id}">${statusBadge}</div>
         </div>
         <h4 class="font-black text-slate-800 leading-tight text-base md:text-lg q-text">${q.q}</h4>
@@ -1180,11 +1195,10 @@ function renderSingleCard(q, idx, total) {
       </div>
     `;
   } else {
-    // MCQ - Already handled in previous step, but adding qId for safety
     html = `
       <div class="bg-white rounded-3xl p-7 border border-slate-200 shadow-sm relative overflow-hidden" id="card-${q.id}">
         <div class="flex items-center justify-between mb-5">
-          <span class="text-[10px] bg-sky-100 text-sky-600 px-3 py-1 rounded-full font-black uppercase tracking-widest">${q.cat || 'MCQ'}</span>
+          <span class="text-[10px] bg-sky-100 text-sky-600 px-3 py-1 rounded-full font-black uppercase tracking-widest">${displayCat}</span>
           ${isSolved ? '<span class="bg-emerald-50 text-emerald-600 text-[10px] font-bold px-2.5 py-1 rounded-full border border-emerald-100">완료 ✓</span>' : ''}
         </div>
         <h4 class="font-black text-slate-800 leading-tight mb-7 text-base md:text-lg q-text">${q.q}</h4>
@@ -1246,7 +1260,7 @@ function updateNavigation() {
 
   if (currentIndex === currentQuestionsList.length - 1) {
     nextBtn.innerHTML = '결과 보기 🏁';
-    nextBtn.className = "flex-[2] bg-indigo-300 text-white font-black py-4 px-4 rounded-2xl text-xs hover:bg-indigo-400 transition shadow-sm flex items-center justify-center gap-2 active:scale-95";
+    nextBtn.className = "flex-[2] bg-blue-300 text-white font-black py-4 px-4 rounded-2xl text-xs hover:bg-blue-400 transition shadow-sm flex items-center justify-center gap-2 active:scale-95";
   } else {
     nextBtn.innerHTML = '다음 문제 <span>→</span>';
     nextBtn.className = "flex-[2] bg-slate-400 text-white font-black py-4 px-4 rounded-2xl text-xs hover:bg-slate-500 transition shadow-sm flex items-center justify-center gap-2 active:scale-95";
@@ -1471,19 +1485,6 @@ function showToast(msg) {
       toast.remove();
     }, 300);
   }, 3800);
-}
-
-// 카테고리 라벨 맵
-function getCategoryLabel(cat) {
-  const labels = {
-    'all': '전체보기',
-    'lim': 'Limitation',
-    'norm': 'Normal & OMB',
-    'weather': 'Weather & Fuel',
-    'nonnorm': 'Non-Normal',
-    'random': '🎲 랜덤 엄선'
-  };
-  return labels[cat] || '전체보기';
 }
 
 function handleAnswer(qId, selectedIdx) {
