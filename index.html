@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#f4f7fc">
+<meta name="theme-color" content="#0f766e">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <!-- iOS 홈 화면 아이콘 및 파비콘 (SVG Data URI) -->
@@ -18,10 +18,13 @@
 <style>
 :root {
   --quiz-font-size: 15px;
+  --theme-bg: #eef6f5;
+  --theme-primary: #0f766e;
+  --theme-primary-soft: #ccfbf1;
 }
 body {
   font-family: 'Inter', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
-  background-color: #f4f7fc;
+  background-color: var(--theme-bg);
   color: #1e293b;
   -webkit-tap-highlight-color: transparent;
   line-height: 1.6;
@@ -106,23 +109,23 @@ body {
 </head>
 <body class="min-h-screen flex flex-col antialiased">
 
-<header class="bg-white/95 backdrop-blur-md sticky top-0 z-50 px-4 py-3 border-b border-sky-100/60 shadow-xs pt-[env(safe-area-inset-top)]">
+<header class="bg-white/95 backdrop-blur-md sticky top-0 z-50 px-4 py-3 border-b border-teal-100/70 shadow-xs pt-[env(safe-area-inset-top)]">
   <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
     <div class="flex items-center gap-2.5 w-full sm:w-auto">
       <div class="leading-tight">
-        <h1 class="font-black text-sm tracking-tight text-sky-500">B787 MASTER MEMO</h1>
+        <h1 class="font-black text-sm tracking-tight text-teal-700">B787 MASTER MEMO</h1>
         <p class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">FCOM/FCTM Intelligence</p>
       </div>
     </div>
     <div class="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto">
       <!-- 상태 칩 -->
-      <div id="statusChip" class="bg-sky-50 border border-sky-100 text-sky-700 rounded-lg py-1 px-2.5 text-xs flex items-center gap-1">
-        <span class="text-sky-500 font-extrabold">풀이</span>
-        <b id="solvedCount" class="text-blue-600 font-mono font-black">0</b>/<span id="totalCount" class="font-mono text-slate-400">0</span>
+      <div id="statusChip" class="bg-teal-50 border border-teal-100 text-teal-700 rounded-lg py-1 px-2.5 text-xs flex items-center gap-1">
+        <span class="text-teal-600 font-extrabold">풀이</span>
+        <b id="solvedCount" class="text-teal-700 font-mono font-black">0</b>/<span id="totalCount" class="font-mono text-slate-400">0</span>
         <button onclick="resetSolves()" class="text-slate-400 hover:text-rose-500 font-bold ml-1 transition" title="기록 초기화">↺</button>
       </div>
       <!-- 랜덤 20문제 실행기 -->
-      <button onclick="startRandomQuiz()" class="bg-blue-500 hover:bg-blue-600 active:scale-95 text-white font-bold py-1.5 px-3 rounded-lg text-xs transition shadow-sm flex items-center gap-1">
+      <button onclick="startRandomQuiz()" class="bg-teal-600 hover:bg-teal-700 active:scale-95 text-white font-bold py-1.5 px-3 rounded-lg text-xs transition shadow-sm flex items-center gap-1">
         <span>랜덤 20제</span>
       </button>
       <!-- 텍스트 크기 조절기 (숫자 제거 및 심플 레이아웃 설계) -->
@@ -147,7 +150,7 @@ body {
     <button onclick="setCategory('nonnorm')" id="cat-nonnorm" class="cat-tab px-3 py-1.5 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap transition">Non-Normal</button>
     <span class="h-4 w-px bg-slate-200 mx-1 shrink-0"></span>
 
-    <button onclick="setMode('mcq')" id="mode-mcq" class="mode-tab px-3 py-1 text-xs font-extrabold rounded-full text-white bg-sky-400 border border-sky-300 shadow-sm whitespace-nowrap transition">객관식 평가</button>
+    <button onclick="setMode('mcq')" id="mode-mcq" class="mode-tab px-3 py-1 text-xs font-extrabold rounded-full text-white bg-teal-500 border border-teal-400 shadow-sm whitespace-nowrap transition">객관식 평가</button>
     <button onclick="setMode('sa')" id="mode-sa" class="mode-tab px-3 py-1 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap transition">주관식 평가</button>
     <button onclick="setMode('fc')" id="mode-fc" class="mode-tab px-3 py-1 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap transition">Flashcard</button>
   </div>
@@ -158,14 +161,14 @@ body {
   <!-- 메인 질문 영역 로더 -->
   <div id="quizArea" class="hidden">
     <!-- 상단 진행바 -->
-    <div class="bg-white rounded-2xl p-4 mb-5 border border-sky-100/50 shadow-xs flex items-center justify-between">
+    <div class="bg-white rounded-2xl p-4 mb-5 border border-teal-100/50 shadow-xs flex items-center justify-between">
       <div class="flex flex-col gap-1.5 flex-1">
         <div class="flex items-center justify-between pr-4">
-          <span id="quizProgressText" class="text-[10px] font-black text-sky-500 uppercase tracking-widest">Question 1 / 20</span>
+        <span id="quizProgressText" class="text-[10px] font-black text-teal-600 uppercase tracking-widest">Question 1 / 20</span>
           <span id="quizPercentText" class="text-[10px] font-mono font-black text-slate-400">5%</span>
         </div>
         <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden mt-0.5">
-          <div id="quizProgressBar" class="h-full bg-sky-300 transition-all duration-500 shadow-[0_0_8px_rgba(125,211,252,0.4)]" style="width: 5%"></div>
+          <div id="quizProgressBar" class="h-full bg-teal-400 transition-all duration-500 shadow-[0_0_8px_rgba(45,212,191,0.4)]" style="width: 5%"></div>
         </div>
       </div>
       <div id="progressDots" class="hidden md:flex progress-dots ml-4"></div>
@@ -189,8 +192,8 @@ body {
 
   <!-- 결과 화면 로더 (히든) -->
   <div id="resultArea" class="hidden space-y-4 card-fade-in">
-    <div class="bg-white rounded-3xl p-8 border border-blue-100 shadow-sm text-center">
-      <div class="w-20 h-20 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">🏆</div>
+    <div class="bg-white rounded-3xl p-8 border border-teal-100 shadow-sm text-center">
+      <div class="w-20 h-20 bg-teal-50 text-teal-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">🏆</div>
       <h2 class="text-xl font-black text-slate-800 mb-1">학습을 완료했습니다!</h2>
       <p class="text-xs text-slate-400 font-medium mb-6">오늘의 시스템 마스터 미션이 성공적으로 기록되었습니다.</p>
 
@@ -205,7 +208,7 @@ body {
         </div>
       </div>
 
-      <button onclick="location.reload()" class="w-full bg-blue-600 text-white font-black py-4 rounded-2xl text-sm hover:bg-blue-700 transition shadow-lg">
+      <button onclick="location.reload()" class="w-full bg-teal-700 text-white font-black py-4 rounded-2xl text-sm hover:bg-teal-800 transition shadow-lg">
         처음으로 돌아가기
       </button>
     </div>
@@ -1175,10 +1178,10 @@ function renderSingleCard(q, idx, total) {
           <!-- 뒷면 -->
           <div class="flip-card-back p-7 flex flex-col justify-between rounded-3xl bg-slate-700 text-white h-full">
             <div class="flex items-center justify-between border-b border-slate-600 pb-3">
-              <span class="text-[10px] font-black text-sky-300 uppercase tracking-widest">Model Answer</span>
+              <span class="text-[10px] font-black text-teal-300 uppercase tracking-widest">Model Answer</span>
             </div>
             <div class="text-sm md:text-base leading-relaxed text-center my-auto mx-auto max-w-2xl text-slate-100 whitespace-pre-line font-medium overflow-y-auto no-scrollbar py-4 break-keep">${q.ans}</div>
-            <div class="text-[10px] text-sky-300/80 text-center font-black uppercase tracking-wider">TAP TO RETURN</div>
+            <div class="text-[10px] text-teal-300/80 text-center font-black uppercase tracking-wider">TAP TO RETURN</div>
           </div>
         </div>
       </div>
@@ -1193,22 +1196,22 @@ function renderSingleCard(q, idx, total) {
     html = `
       <div class="bg-white rounded-3xl p-7 border border-slate-200 shadow-sm space-y-6" id="card-${q.id}">
         <div class="flex items-center justify-between">
-          <span class="text-[10px] bg-sky-100 text-sky-600 px-3 py-1 rounded-full font-black uppercase tracking-widest">${displayCat}</span>
+          <span class="text-[10px] bg-teal-100 text-teal-700 px-3 py-1 rounded-full font-black uppercase tracking-widest">${displayCat}</span>
           <div id="grade-badge-container-${q.id}">${statusBadge}</div>
         </div>
         <h4 class="font-black text-slate-800 leading-tight text-base md:text-lg q-text">${q.q}</h4>
         <textarea id="user-ans-${q.id}" rows="4"
-          class="w-full p-4 rounded-2xl border border-slate-100 bg-slate-50 focus:bg-white focus:border-sky-300 focus:ring-1 focus:ring-sky-200 text-sm font-semibold text-slate-700 outline-none transition resize-none"
+          class="w-full p-4 rounded-2xl border border-slate-100 bg-slate-50 focus:bg-white focus:border-teal-400 focus:ring-1 focus:ring-teal-200 text-sm font-semibold text-slate-700 outline-none transition resize-none"
           placeholder="Type keywords here..."></textarea>
         <button id="btn-check-${q.id}" onclick="checkSubjectiveAnswer('${q.id}')"
           class="w-full bg-slate-400 text-white font-black py-4 px-4 rounded-2xl text-xs hover:bg-slate-500 transition active:scale-[0.98] ${isSolved ? 'opacity-50' : ''}" ${isSolved ? 'disabled' : ''}>
           🔍 ANALYZE KEYWORDS
         </button>
         <div id="match-result-${q.id}" class="space-y-2"></div>
-        <div id="model-ans-${q.id}" class="mt-4 p-6 rounded-2xl border-l-4 bg-sky-50 border-sky-200 ${isSolved ? '' : 'hidden'} shadow-inner">
-          <div class="font-black text-[10px] uppercase tracking-widest text-sky-600 mb-2.5">✓ MODEL REFERENCE</div>
+        <div id="model-ans-${q.id}" class="mt-4 p-6 rounded-2xl border-l-4 bg-teal-50 border-teal-200 ${isSolved ? '' : 'hidden'} shadow-inner">
+          <div class="font-black text-[10px] uppercase tracking-widest text-teal-700 mb-2.5">✓ MODEL REFERENCE</div>
           <p class="font-semibold text-slate-800 text-sm leading-relaxed">${q.ans}</p>
-          <div id="grade-panel-${q.id}" class="mt-5 pt-5 border-t border-sky-100/50 flex flex-wrap gap-2.5">
+        <div id="grade-panel-${q.id}" class="mt-5 pt-5 border-t border-teal-100/50 flex flex-wrap gap-2.5">
             <button onclick="gradeSubjective('${q.id}', 'perfect')" class="flex-1 bg-white hover:bg-emerald-50 text-emerald-600 border border-emerald-100 font-bold px-3 py-2 rounded-xl text-[10px] transition">🌟 PERFECT</button>
             <button onclick="gradeSubjective('${q.id}', 'partial')" class="flex-1 bg-white hover:bg-amber-50 text-amber-600 border border-amber-100 font-bold px-3 py-2 rounded-xl text-[10px] transition">👍 GOOD</button>
             <button onclick="gradeSubjective('${q.id}', 'needs_review')" class="flex-1 bg-white hover:bg-rose-50 text-rose-600 border border-rose-100 font-bold px-3 py-2 rounded-xl text-[10px] transition">🔁 REVIEW</button>
@@ -1220,7 +1223,7 @@ function renderSingleCard(q, idx, total) {
     html = `
       <div class="bg-white rounded-3xl p-7 border border-slate-200 shadow-sm relative overflow-hidden" id="card-${q.id}">
         <div class="flex items-center justify-between mb-5">
-          <span class="text-[10px] bg-sky-100 text-sky-600 px-3 py-1 rounded-full font-black uppercase tracking-widest">${displayCat}</span>
+          <span class="text-[10px] bg-teal-100 text-teal-700 px-3 py-1 rounded-full font-black uppercase tracking-widest">${displayCat}</span>
           ${isSolved ? '<span class="bg-emerald-50 text-emerald-600 text-[10px] font-bold px-2.5 py-1 rounded-full border border-emerald-100">완료 ✓</span>' : ''}
         </div>
         <h4 class="font-black text-slate-800 leading-tight mb-7 text-base md:text-lg q-text">${q.q}</h4>
@@ -1282,7 +1285,7 @@ function updateNavigation() {
 
   if (currentIndex === currentQuestionsList.length - 1) {
     nextBtn.innerHTML = '결과 보기 🏁';
-    nextBtn.className = "w-auto min-w-[132px] bg-blue-300 text-white font-black py-4 px-5 rounded-2xl text-xs hover:bg-blue-400 transition shadow-sm flex items-center justify-center gap-2 active:scale-95";
+    nextBtn.className = "w-auto min-w-[132px] bg-teal-400 text-white font-black py-4 px-5 rounded-2xl text-xs hover:bg-teal-500 transition shadow-sm flex items-center justify-center gap-2 active:scale-95";
   } else {
     nextBtn.innerHTML = '다음 문제 <span>→</span>';
     nextBtn.className = "w-auto min-w-[132px] bg-slate-400 text-white font-black py-4 px-5 rounded-2xl text-xs hover:bg-slate-500 transition shadow-sm flex items-center justify-center gap-2 active:scale-95";
@@ -1367,7 +1370,7 @@ function setCategory(cat) {
   });
   const activeTab = document.getElementById('cat-' + cat);
   if (activeTab) {
-    activeTab.className = "cat-tab px-3 py-1.5 text-xs font-extrabold rounded-full text-white bg-sky-400 shadow-sm whitespace-nowrap transition";
+    activeTab.className = "cat-tab px-3 py-1.5 text-xs font-extrabold rounded-full text-white bg-teal-500 shadow-sm whitespace-nowrap transition";
   }
   render();
 }
@@ -1393,7 +1396,7 @@ function setMode(mode) {
   const activeTab = document.getElementById('mode-' + mode);
   if (activeTab) {
     if (mode === 'mcq') {
-      activeTab.className = "mode-tab px-3 py-1 text-xs font-extrabold rounded-full text-white bg-sky-400 border border-sky-300 shadow-sm whitespace-nowrap transition";
+      activeTab.className = "mode-tab px-3 py-1 text-xs font-extrabold rounded-full text-white bg-teal-500 border border-teal-400 shadow-sm whitespace-nowrap transition";
     } else if (mode === 'sa') {
       activeTab.className = "mode-tab px-3 py-1 text-xs font-extrabold rounded-full text-white bg-indigo-300 border border-indigo-200 shadow-sm whitespace-nowrap transition";
     } else if (mode === 'fc') {
@@ -1503,7 +1506,7 @@ function showToast(msg) {
 
   const toast = document.createElement('div');
   toast.id = 'quiz-toast';
-  toast.className = 'fixed top-4 left-1/2 -translate-x-1/2 bg-sky-50 border border-sky-200 text-sky-800 text-xs font-semibold py-3 px-5 rounded-2xl shadow-md z-[9999] transition-all duration-300 transform translate-y-[-20px] opacity-0 flex items-center gap-2 max-w-[90%] text-center';
+  toast.className = 'fixed top-4 left-1/2 -translate-x-1/2 bg-teal-50 border border-teal-200 text-teal-800 text-xs font-semibold py-3 px-5 rounded-2xl shadow-md z-[9999] transition-all duration-300 transform translate-y-[-20px] opacity-0 flex items-center gap-2 max-w-[90%] text-center';
   toast.innerHTML = `<span>💡</span> <span>${msg}</span>`;
   
   document.body.appendChild(toast);
