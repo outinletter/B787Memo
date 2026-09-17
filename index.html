@@ -1012,6 +1012,13 @@ let subSolvedStatus = {}; // Subjective grading status map
 let currentRandomList = []; // 현재 랜덤 실행 상태 보존용 리스트
 const ALL_QUESTIONS_MAP = {}; // Global flat lookup map for all questions by ID
 
+// 모든 객관식 카테고리의 문제를 하나의 목록으로 연결
+function getAllMCQQuestions() {
+  return Object.entries(SYSTEM_QUIZ_DATA)
+    .filter(([category]) => category !== 'sa')
+    .flatMap(([, questions]) => questions);
+}
+
 // 카드 시스템 전용 상태
 let currentIndex = 0;
 let currentQuestionsList = [];
@@ -1079,7 +1086,7 @@ function render() {
       questions = currentRandomList;
     } else {
       questions = (currentCategory === 'all')
-        ? [...SYSTEM_QUIZ_DATA.lim, ...SYSTEM_QUIZ_DATA.norm, ...SYSTEM_QUIZ_DATA.weather, ...SYSTEM_QUIZ_DATA.nonnorm]
+        ? getAllMCQQuestions()
         : SYSTEM_QUIZ_DATA[currentCategory] || [];
     }
   }
@@ -1400,7 +1407,7 @@ function renderRandom() {
   currentCategory = 'random';
   viewMode = 'mcq';
 
-  const allMCQs = [...SYSTEM_QUIZ_DATA.lim, ...SYSTEM_QUIZ_DATA.norm, ...SYSTEM_QUIZ_DATA.weather, ...SYSTEM_QUIZ_DATA.nonnorm];
+  const allMCQs = getAllMCQQuestions();
   let unsolvedMCQs = allMCQs.filter(q => !solvedList.has(q.id));
   let selected = [];
 
